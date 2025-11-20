@@ -46,53 +46,77 @@ END FUNCTION
 
 
 // Merge Sort Algorithm
-FUNCTION mergeSort(array(float) arr)
-
-    // Find the middle index to split the array into two halves
-    int mid = arr.length / 2
-
-    // Recursively sort the two halves
-    array(float) left = mergeSort(arr[0..mid-1])
-    array(float) right = mergeSort(arr[mid..arr.length-1])
-
-    // Merge the now-sorted halves
-    array(float) result = merge(left, right)
-
-    RETURN result
+//(initial input would be: mergeSort(arr, 0, arr.length - 1))
+FUNCTION mergeSort(array(float) arr, int left, int right)
+    
+    IF left < right 
+        
+        // Find the mid point in the array
+        int mid = left + (right - left) / 2
+        
+        // Sort first and second half
+        mergeSort(arr, left, mid)
+        mergeSort(arr, mid + 1, right)
+        
+        // Merge sorted halves
+        merge(arr, left, mid, right)
+        
+    END IF
 END FUNCTION
 
 
-// Helper function to merge two sorted arrays
-FUNCTION merge(array(float) left, array(float) right)
-
-    list(float) result = new empty list
-    int i = 0 // index for left array
-    int j = 0 // index for right array
-
-    // Compare elements from left and right and add the smaller one to the result
-    WHILE i < left.length AND j < right.length 
-        IF left[i] <= right[j]
-            result.append(left[i])
+// Helper function to merge two sorted subarrays
+FUNCTION merge(array(float) arr, int left, int mid, int right)
+    
+    // Find lengths of the two sub arrays which will be created
+    int n1 = mid - left + 1
+    int n2 = right - mid
+    
+    // Create temporary arrays
+    array(float) L = new array of size n1
+    array(float) R = new array of size n2
+    
+    // Copy data to temporary arrays from input arr
+    FOR i FROM 0 TO n1 - 1
+        L[i] = arr[left + i]
+    END FOR
+    
+    FOR j FROM 0 TO n2 - 1
+        R[j] = arr[mid + 1 + j]
+    END FOR
+        
+    // Initial indexes of first and second subarrays
+    int i = 0
+    int j = 0
+    
+    // Initial index of merged subarray
+    int k = left
+    
+    WHILE i < n1 AND j < n2 
+        IF L[i] <= R[j]
+            arr[k] = L[i]
             i = i + 1
         ELSE
-            result.append(right[j])
+            arr[k] = R[j]
             j = j + 1
         END IF
+        k = k + 1
     END WHILE
-
-    // Add any remaining elements from the left array
-    WHILE i < left.length 
-        result.append(left[i])
+    
+    // Copy remaining elements of L[] (if any)
+    WHILE i < n1 
+        arr[k] = L[i]
         i = i + 1
+        k = k + 1
     END WHILE
-
-    // Add any remaining elements from the right array
-    WHILE j < right.length 
-        result.append(right[j])
+    
+    // Copy remaining elements of R[] (if any)
+    WHILE j < n2 
+        arr[k] = R[j]
         j = j + 1
+        k = k + 1
     END WHILE
-
-    RETURN result
+    
 END FUNCTION
 
 
