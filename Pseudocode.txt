@@ -1,0 +1,140 @@
+
+//Bucket Sort Algorithm
+FUNCTION bucketSort(array(float) arr)
+
+    // Store length of array and create buckets
+    int n = arr.length
+    list(list(float)) buckets = new list of n empty lists
+
+    FOR i FROM 0 TO n-1 
+        int bucketIndex = int(n * arr[i])  // determine which bucket arr[i] belongs in
+        buckets[bucketIndex].add(arr[i]) // add the arr value to the bucket (bucket is a list)
+
+    list(float) result = new empty list
+
+    // For each bucket, perform an insertion sort on the values it contains
+    FOR i FROM 0 TO n-1 
+        InsertionSort(buckets[i])
+        result.append(bucket)  // add the entire bucket to result
+
+    RETURN result // (buckets are already in order from smallest to largest when appended)
+END FUNCTION
+
+
+
+// Merge Sort Algorithm
+FUNCTION mergeSort(array(comparable) arr)
+
+    // Base case: an array of 0 or 1 elements is already sorted
+    IF arr.length <= 1
+        RETURN arr
+    END IF
+
+    // Find the middle index to divide the array into two halves
+    int mid = arr.length / 2
+
+    // Recursively sort the two halves
+    array(comparable) leftHalf = mergeSort(arr[0..mid-1])
+    array(comparable) rightHalf = mergeSort(arr[mid..arr.length-1])
+
+    // Merge the now-sorted halves
+    array(comparable) result = merge(leftHalf, rightHalf)
+
+    RETURN result
+END FUNCTION
+
+
+
+// Merge Sort Algorithm
+FUNCTION mergeSort(array(float) arr)
+
+    // Find the middle index to split the array into two halves
+    int mid = arr.length / 2
+
+    // Recursively sort the two halves
+    array(float) left = mergeSort(arr[0..mid-1])
+    array(float) right = mergeSort(arr[mid..arr.length-1])
+
+    // Merge the now-sorted halves
+    array(float) result = merge(left, right)
+
+    RETURN result
+END FUNCTION
+
+
+// Helper function to merge two sorted arrays
+FUNCTION merge(array(float) left, array(float) right)
+
+    list(float) result = new empty list
+    int i = 0 // index for left array
+    int j = 0 // index for right array
+
+    // Compare elements from left and right and add the smaller one to the result
+    WHILE i < left.length AND j < right.length 
+        IF left[i] <= right[j]
+            result.append(left[i])
+            i = i + 1
+        ELSE
+            result.append(right[j])
+            j = j + 1
+        END IF
+    END WHILE
+
+    // Add any remaining elements from the left array
+    WHILE i < left.length 
+        result.append(left[i])
+        i = i + 1
+    END WHILE
+
+    // Add any remaining elements from the right array
+    WHILE j < right.length 
+        result.append(right[j])
+        j = j + 1
+    END WHILE
+
+    RETURN result
+END FUNCTION
+
+
+
+// Linear Search Algorithm
+FUNCTION linearSearch(array(float) arr, float target)
+
+    // Iterate through every element in the array
+    FOR i FROM 0 TO arr.length - 1 
+        // Check if the current element matches the target
+        IF arr[i] == target 
+            RETURN i  // Target found, return its index
+        END IF
+    END FOR
+END FUNCTION
+
+
+
+
+// Binary Search Algorithm (Assumes the input array is already sorted)
+FUNCTION binarySearch(array(float) arr, float target)
+
+    // Initialize the search boundaries to the entire array
+    int low = 0
+    int high = arr.length - 1
+
+    // Continue searching while the search space is valid
+    WHILE low <= high 
+
+        // Find the middle element of the current search space
+        int mid = (low + high) / 2
+        float midValue = arr[mid]
+
+        IF target == midValue THEN
+            RETURN mid        // Target found at index 'mid'
+        ELSE IF target < midValue THEN
+            high = mid - 1    // Discard the right half
+        ELSE
+            low = mid + 1     // Discard the left half
+        END IF
+
+    END WHILE
+
+    RETURN -1  // Target was not found in the array
+END FUNCTION
