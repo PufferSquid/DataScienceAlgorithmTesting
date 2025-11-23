@@ -162,3 +162,108 @@ FUNCTION binarySearch(array(float) arr, float target)
 
     RETURN -1  // Target was not found in the array
 END FUNCTION
+
+
+
+
+// Dijkstra's Algorithm for finding shortest paths from a start vertex
+FUNCTION dijkstra(Graph graph, string startVertexData)
+
+    // Find the index of the starting vertex in the vertex data array
+    int start_vertex = graph.vertex_data.indexOf(startVertexData)
+    
+    //Initialize distances array with infinity for all vertices
+    array(float) distances = new array of size graph.size
+    FOR i FROM 0 TO graph.size - 1
+        distances[i] = INFINITY
+    END FOR
+
+    distances[start_vertex] = 0 // Set first to 0 (very important)
+    
+    // Initialize visited array to track processed vertices
+    array(boolean) visited = new array of size graph.size
+    FOR i FROM 0 TO graph.size - 1
+        visited[i] = false
+    END FOR
+
+    // Process all vertices
+    FOR count FROM 0 TO graph.size - 1
+        
+        // Find the unvisited vertex with the smallest distance
+        float min_distance = INFINITY
+        int u = -1  // will store the index of the selected vertex
+        
+        FOR i FROM 0 TO graph.size - 1
+            IF visited[i] == false AND distances[i] < min_distance THEN
+                min_distance = distances[i]
+                u = i
+            END IF
+        END FOR
+        
+        // If no suitable vertex found, exit early
+        IF u == -1 THEN
+            BREAK
+        END IF
+        
+        // Mark the selected vertex as visited
+        visited[u] = true
+        
+        // Update distances to all adjacent vertices
+        FOR v FROM 0 TO graph.size - 1
+            // Check if there's an edge and vertex is unvisited
+            IF graph.adj_matrix[u][v] != 0 AND visited[v] == false THEN
+                float alt = distances[u] + graph.adj_matrix[u][v]
+                IF alt < distances[v] THEN
+                    distances[v] = alt
+                END IF
+            END IF
+        END FOR
+        
+    END FOR
+    
+    RETURN distances
+END FUNCTION
+
+
+
+// Bellman-Ford Algorithm for finding shortest paths with negative weight detection
+FUNCTION bellmanFord(int num_vertices, array(int) edges, int source_vertex)
+
+    // Set up distances array with very large values to represent infinity
+    array(int) distances = new array of size num_vertices
+    FOR i FROM 0 TO num_vertices - 1
+        distances[i] = INFINITY  // Represents an unreachable distance
+    END FOR
+    
+    // The distance from the source vertex to itself is always zero
+    distances[source_vertex] = 0
+
+    // Determine how many edges are in the input list
+    int num_edges = edges.rowCount()
+
+    // Process all edges repeatedly to gradually improve distance estimates
+    FOR i FROM 0 TO num_vertices - 1
+        FOR j FROM 0 TO num_edges - 1
+            
+            // Get the details for the current edge being considered
+            int u = edges[j, 0]  // Starting vertex of the edge
+            int v = edges[j, 1]  // Ending vertex of the edge  
+            int weight = edges[j, 2]  // Cost to traverse this edge
+
+            // Check if we can improve the path to vertex v via vertex u
+            IF distances[u] != LARGE_VALUE AND distances[u] + weight < distances[v] THEN
+                
+                // If we're in the final iteration and still improving, negative cycle exists
+                IF i == num_vertices - 1 THEN
+                    RETURN array with single element [-1]  // Signal that a negative cycle was found
+                END IF
+                
+                // Update with the new shorter distance found
+                distances[v] = distances[u] + weight
+            END IF
+        END FOR
+    END FOR
+
+    // Return the computed shortest path distances
+    RETURN distances
+END FUNCTION
