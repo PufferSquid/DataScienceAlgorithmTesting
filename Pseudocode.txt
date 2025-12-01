@@ -2,47 +2,35 @@
 //Bucket Sort Algorithm
 FUNCTION bucketSort(array(float) arr)
 
-    // Store length of array and create buckets
-    int n = arr.length
-    list(list(float)) buckets = new list of n empty lists
+    IF arr.length <= 1
+        RETURN arr
+    END IF
 
-    FOR i FROM 0 TO n-1 
-        int bucketIndex = int(n * arr[i])  // determine which bucket arr[i] belongs in
+    // Store min and max values in the arr
+    int minVal = smallest value in arr
+    int maxVal = largest value in arr
+
+    // bucket count is a fixed 10 for these tests
+    int bucketCount = 10
+
+    // store range of values each bucket holds
+    bucket_range = (max_val - min_val + 1) / bucket_count
+
+    list(list(float)) buckets = new list of empty lists equal to bucket count
+
+    FOR EACH value IN arr
+        int bucketIndex = int((value - min_val) / bucket_range)  // determine which bucket arr[i] belongs in
         buckets[bucketIndex].add(arr[i]) // add the arr value to the bucket (bucket is a list)
 
     list(float) result = new empty list
 
     // For each bucket, perform an insertion sort on the values it contains
-    FOR i FROM 0 TO n-1 
-        InsertionSort(buckets[i])
-        result.append(bucket)  // add the entire bucket to result
+    FOR EACH bucket IN buckets
+        sortedBucket = InsertionSort(buckets[i])
+        result.append(sortedBucket)  // add the entire bucket to result
 
     RETURN result // (buckets are already in order from smallest to largest when appended)
 END FUNCTION
-
-
-
-// Merge Sort Algorithm
-FUNCTION mergeSort(array(comparable) arr)
-
-    // Base case: an array of 0 or 1 elements is already sorted
-    IF arr.length <= 1
-        RETURN arr
-    END IF
-
-    // Find the middle index to divide the array into two halves
-    int mid = arr.length / 2
-
-    // Recursively sort the two halves
-    array(comparable) leftHalf = mergeSort(arr[0..mid-1])
-    array(comparable) rightHalf = mergeSort(arr[mid..arr.length-1])
-
-    // Merge the now-sorted halves
-    array(comparable) result = merge(leftHalf, rightHalf)
-
-    RETURN result
-END FUNCTION
-
 
 
 // Merge Sort Algorithm
@@ -81,8 +69,8 @@ FUNCTION merge(array(float) arr, int left, int mid, int right)
         L[i] = arr[left + i]
     END FOR
     
-    FOR j FROM 0 TO n2 - 1
-        R[j] = arr[mid + 1 + j]
+    FOR i FROM 0 TO n2 - 1
+        R[i] = arr[mid + 1 + i]
     END FOR
         
     // Initial indexes of first and second subarrays
@@ -151,11 +139,11 @@ FUNCTION binarySearch(array(float) arr, float target)
         float midValue = arr[mid]
 
         IF target == midValue THEN
-            RETURN mid        // Target found at index 'mid'
+            RETURN mid // Target found at index 'mid'
         ELSE IF target < midValue THEN
-            high = mid - 1    // Discard the right half
+            high = mid - 1 // Discard the right half
         ELSE
-            low = mid + 1     // Discard the left half
+            low = mid + 1// Discard the left half
         END IF
 
     END WHILE
@@ -167,61 +155,54 @@ END FUNCTION
 
 
 // Dijkstra's Algorithm for finding shortest paths from a start vertex
-FUNCTION dijkstra(Graph graph, string startVertexData)
+FUNCTION Dijkstra(dict graph, str startNode)
 
-    // Find the index of the starting vertex in the vertex data array
-    int start_vertex = graph.vertex_data.indexOf(startVertexData)
-    
-    //Initialize distances array with infinity for all vertices
-    array(float) distances = new array of size graph.size
-    FOR i FROM 0 TO graph.size - 1
-        distances[i] = INFINITY
+    // Initialize all distances to infinity and the start node distance to 0
+    dict distances = new empty dictionary
+    FOR EACH node IN graph.keys
+        distances[node] = INFINITY
     END FOR
-
-    distances[start_vertex] = 0 // Set first to 0 (very important)
+    distances[startNode] = 0
     
-    // Initialize visited array to track processed vertices
-    array(boolean) visited = new array of size graph.size
-    FOR i FROM 0 TO graph.size - 1
-        visited[i] = false
-    END FOR
-
-    // Process all vertices
-    FOR count FROM 0 TO graph.size - 1
+    // Initialize an empty set to track visited nodes
+    set visited = EMPTY_SET
+    
+    // Iterate through all nodes in the graph
+    FOR i = 0 TO graph.length - 1
         
-        // Find the unvisited vertex with the smallest distance
-        float min_distance = INFINITY
-        int u = -1  // will store the index of the selected vertex
+        // Find the unvisited node with the smallest distance
+        float minDistance = INFINITY
+        str currentNode = NULL
         
-        FOR i FROM 0 TO graph.size - 1
-            IF visited[i] == false AND distances[i] < min_distance THEN
-                min_distance = distances[i]
-                u = i
+        FOR EACH node IN graph.keys
+            IF node NOT IN visited AND distances[node] < minDistance THEN
+                minDistance = distances[node]
+                currentNode = node
             END IF
         END FOR
         
-        // If no suitable vertex found, exit early
-        IF u == -1 THEN
+        // If no valid node is found, break the loop
+        IF currentNode == NULL THEN
             BREAK
         END IF
         
-        // Mark the selected vertex as visited
-        visited[u] = true
+        // Mark the current node as visited
+        visited.add(currentNode)
         
-        // Update distances to all adjacent vertices
-        FOR v FROM 0 TO graph.size - 1
-            // Check if there's an edge and vertex is unvisited
-            IF graph.adj_matrix[u][v] != 0 AND visited[v] == false THEN
-                float alt = distances[u] + graph.adj_matrix[u][v]
-                IF alt < distances[v] THEN
-                    distances[v] = alt
+        // Update distances for neighboring nodes
+        FOR EACH neighbor, cost IN graph[currentNode].items
+            IF neighbor NOT IN visited THEN
+                float newDistance = distances[currentNode] + cost
+                
+                IF newDistance < distances[neighbor] THEN
+                    distances[neighbor] = newDistance
                 END IF
             END IF
         END FOR
         
     END FOR
     
-    RETURN distances
+    RETURN distances  // Return shortest distances from start node
 END FUNCTION
 
 
